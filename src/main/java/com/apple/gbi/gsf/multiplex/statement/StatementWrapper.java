@@ -1,0 +1,260 @@
+package com.apple.gbi.gsf.multiplex.statement;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.SQLWarning;
+import java.sql.Statement;
+import java.util.Properties;
+
+import com.apple.gbi.gsf.multiplex.connection.AbstractConnectionWrapper;
+import com.apple.gbi.gsf.multiplex.constant.MultiplexConstant;
+import com.apple.gbi.gsf.multiplex.utils.MultiplexUtils;
+
+public class StatementWrapper implements Statement {
+  
+  private Statement delegate;
+  
+  private String qdbHint;
+  
+  public StatementWrapper(final Statement delegate) {
+    this.delegate = delegate;
+  }
+  
+  public StatementWrapper(final Statement delegate, final Properties info) {
+    this(delegate);
+    this.qdbHint = MultiplexUtils.getValue(info, MultiplexConstant.QDB_HINT);
+  }
+  
+  public String getQdbHint() {
+    return qdbHint;
+  }
+  
+  private String getQdbHintSql(final String sql) {
+    final String sqlWithQdbHint = MultiplexUtils.getQdbHintSql(sql, this.getQdbHint());
+    System.out.println("Final Statement Query :: " + sqlWithQdbHint);
+    return sqlWithQdbHint;
+  }
+
+  @Override
+  public <T> T unwrap(Class<T> iface) throws SQLException {
+    return this.delegate.unwrap(iface);
+  }
+
+  @Override
+  public boolean isWrapperFor(Class<?> iface) throws SQLException {
+    return this.delegate.isWrapperFor(iface);
+  }
+
+  @Override
+  public ResultSet executeQuery(String sql) throws SQLException {
+    return this.delegate.executeQuery(getQdbHintSql(sql));
+  }
+
+  @Override
+  public int executeUpdate(String sql) throws SQLException {
+    return this.delegate.executeUpdate(getQdbHintSql(sql));
+  }
+
+  @Override
+  public void close() throws SQLException {
+    if(!this.delegate.isClosed()) {
+      this.delegate.close();
+    }
+  }
+
+  @Override
+  public int getMaxFieldSize() throws SQLException {
+    return this.delegate.getMaxFieldSize();
+  }
+
+  @Override
+  public void setMaxFieldSize(int max) throws SQLException {
+    this.delegate.setMaxFieldSize(max);
+  }
+
+  @Override
+  public int getMaxRows() throws SQLException {
+    return this.delegate.getMaxRows();
+  }
+
+  @Override
+  public void setMaxRows(int max) throws SQLException {
+    this.delegate.setMaxRows(max);
+  }
+
+  @Override
+  public void setEscapeProcessing(boolean enable) throws SQLException {
+    this.delegate.setEscapeProcessing(enable);
+  }
+
+  @Override
+  public int getQueryTimeout() throws SQLException {
+    return this.delegate.getQueryTimeout();
+  }
+
+  @Override
+  public void setQueryTimeout(int seconds) throws SQLException {
+    this.delegate.setQueryTimeout(seconds);
+  }
+
+  @Override
+  public void cancel() throws SQLException {
+    this.delegate.cancel();
+  }
+
+  @Override
+  public SQLWarning getWarnings() throws SQLException {
+    return this.delegate.getWarnings();
+  }
+
+  @Override
+  public void clearWarnings() throws SQLException {
+    this.delegate.clearWarnings();
+  }
+
+  @Override
+  public void setCursorName(String name) throws SQLException {
+    this.delegate.setCursorName(name);
+  }
+
+  @Override
+  public boolean execute(String sql) throws SQLException {
+    return this.delegate.execute(getQdbHintSql(sql));
+  }
+
+  @Override
+  public ResultSet getResultSet() throws SQLException {
+    return this.delegate.getResultSet();
+  }
+
+  @Override
+  public int getUpdateCount() throws SQLException {
+    return this.delegate.getUpdateCount();
+  }
+
+  @Override
+  public boolean getMoreResults() throws SQLException {
+    return this.delegate.getMoreResults();
+  }
+
+  @Override
+  public void setFetchDirection(int direction) throws SQLException {
+    this.delegate.setFetchDirection(direction);
+  }
+
+  @Override
+  public int getFetchDirection() throws SQLException {
+    return this.delegate.getFetchDirection();
+  }
+
+  @Override
+  public void setFetchSize(int rows) throws SQLException {
+    this.delegate.setFetchSize(rows);
+  }
+
+  @Override
+  public int getFetchSize() throws SQLException {
+    return this.delegate.getFetchSize();
+  }
+
+  @Override
+  public int getResultSetConcurrency() throws SQLException {
+    return this.delegate.getResultSetConcurrency();
+  }
+
+  @Override
+  public int getResultSetType() throws SQLException {
+    return this.delegate.getResultSetType();
+  }
+
+  @Override
+  public void addBatch(String sql) throws SQLException {
+    this.delegate.addBatch(getQdbHintSql(sql));
+  }
+
+  @Override
+  public void clearBatch() throws SQLException {
+    this.delegate.clearBatch();
+  }
+
+  @Override
+  public int[] executeBatch() throws SQLException {
+    return this.delegate.executeBatch();
+  }
+
+  @Override
+  public AbstractConnectionWrapper getConnection() throws SQLException {
+    return (AbstractConnectionWrapper) this.delegate.getConnection();
+  }
+
+  @Override
+  public boolean getMoreResults(int current) throws SQLException {
+    return this.delegate.getMoreResults(current);
+  }
+
+  @Override
+  public ResultSet getGeneratedKeys() throws SQLException {
+    return this.delegate.getGeneratedKeys();
+  }
+
+  @Override
+  public int executeUpdate(String sql, int autoGeneratedKeys) throws SQLException {
+    return this.delegate.executeUpdate(getQdbHintSql(sql), autoGeneratedKeys);
+  }
+
+  @Override
+  public int executeUpdate(String sql, int[] columnIndexes) throws SQLException {
+    return this.delegate.executeUpdate(getQdbHintSql(sql), columnIndexes);
+  }
+
+  @Override
+  public int executeUpdate(String sql, String[] columnNames) throws SQLException {
+    return this.delegate.executeUpdate(getQdbHintSql(sql), columnNames);
+  }
+
+  @Override
+  public boolean execute(String sql, int autoGeneratedKeys) throws SQLException {
+    return this.delegate.execute(getQdbHintSql(sql), autoGeneratedKeys);
+  }
+
+  @Override
+  public boolean execute(String sql, int[] columnIndexes) throws SQLException {
+    return this.delegate.execute(getQdbHintSql(sql), columnIndexes);
+  }
+
+  @Override
+  public boolean execute(String sql, String[] columnNames) throws SQLException {
+    return this.delegate.execute(getQdbHintSql(sql), columnNames);
+  }
+
+  @Override
+  public int getResultSetHoldability() throws SQLException {
+    return this.delegate.getResultSetHoldability();
+  }
+
+  @Override
+  public boolean isClosed() throws SQLException {
+    return this.delegate.isClosed();
+  }
+
+  @Override
+  public void setPoolable(boolean poolable) throws SQLException {
+    this.delegate.setPoolable(poolable);
+  }
+
+  @Override
+  public boolean isPoolable() throws SQLException {
+    return this.delegate.isPoolable();
+  }
+
+  @Override
+  public void closeOnCompletion() throws SQLException {
+    this.delegate.closeOnCompletion();
+  }
+
+  @Override
+  public boolean isCloseOnCompletion() throws SQLException {
+    return this.delegate.isCloseOnCompletion();
+  }
+
+}
